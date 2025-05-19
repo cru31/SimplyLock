@@ -1,0 +1,254 @@
+{
+  "mappings": [
+    {
+      "id": "Facebook",
+      "hosts": ["facebook.com", "fb.com", "www.facebook.com", "m.facebook.com"],
+      "bundle": "com.facebook.Facebook"
+    },
+    {
+      "id": "YouTube",
+      "hosts": ["youtube.com", "youtu.be", "www.youtube.com", "m.youtube.com"],
+      "bundle": "com.google.youtube"
+    },
+    {
+      "id": "Twitter",
+      "hosts": ["twitter.com", "x.com", "www.twitter.com"],
+      "bundle": "com.twitter.Twitter"
+    },
+    {
+      "id": "Instagram",
+      "hosts": ["instagram.com", "www.instagram.com", "m.instagram.com"],
+      "bundle": "com.instagram.Instagram"
+    },
+    {
+      "id": "Google",
+      "hosts": ["google.com", "www.google.com"],
+      "bundle": "com.google.android.googlequicksearchbox"
+    },
+    {
+      "id": "LinkedIn",
+      "hosts": ["linkedin.com", "www.linkedin.com"],
+      "bundle": "com.linkedin.LinkedIn"
+    },
+    {
+      "id": "Reddit",
+      "hosts": ["reddit.com", "www.reddit.com"],
+      "bundle": "com.reddit.frontpage"
+    },
+    {
+      "id": "TikTok",
+      "hosts": ["tiktok.com", "www.tiktok.com"],
+      "bundle": "com.zhiliaoapp.musically"
+    },
+    {
+      "id": "Snapchat",
+      "hosts": ["snapchat.com", "www.snapchat.com"],
+      "bundle": "com.snapchat.Snapchat"
+    },
+    {
+      "id": "Pinterest",
+      "hosts": ["pinterest.com", "www.pinterest.com"],
+      "bundle": "com.pinterest.Pinterest"
+    },
+    {
+      "id": "WhatsApp",
+      "hosts": ["whatsapp.com", "www.whatsapp.com"],
+      "bundle": "com.whatsapp.WhatsApp"
+    },
+    {
+      "id": "Amazon",
+      "hosts": ["amazon.com", "www.amazon.com"],
+      "bundle": "com.amazon.Amazon"
+    },
+    {
+      "id": "Netflix",
+      "hosts": ["netflix.com", "www.netflix.com"],
+      "bundle": "com.netflix.Netflix"
+    },
+    {
+      "id": "Spotify",
+      "hosts": ["spotify.com", "www.spotify.com"],
+      "bundle": "com.spotify.Spotify"
+    },
+    {
+      "id": "Apple",
+      "hosts": ["apple.com", "www.apple.com"],
+      "bundle": "com.apple.Apple"
+    },
+    {
+      "id": "Microsoft",
+      "hosts": ["microsoft.com", "www.microsoft.com"],
+      "bundle": "com.microsoft.Office"
+    },
+    {
+      "id": "Discord",
+      "hosts": ["discord.com", "www.discord.com"],
+      "bundle": "com.discord.Discord"
+    },
+    {
+      "id": "Telegram",
+      "hosts": ["telegram.org", "www.telegram.org"],
+      "bundle": "org.telegram.Telegram"
+    },
+    {
+      "id": "Twitch",
+      "hosts": ["twitch.tv", "www.twitch.tv"],
+      "bundle": "tv.twitch.Twitch"
+    },
+    {
+      "id": "Vimeo",
+      "hosts": ["vimeo.com", "www.vimeo.com"],
+      "bundle": "com.vimeo.Vimeo"
+    },
+    {
+      "id": "Medium",
+      "hosts": ["medium.com", "www.medium.com"],
+      "bundle": "com.medium.Medium"
+    },
+    {
+      "id": "eBay",
+      "hosts": ["ebay.com", "www.ebay.com"],
+      "bundle": "com.ebay.eBay"
+    },
+    {
+      "id": "Yahoo",
+      "hosts": ["yahoo.com", "www.yahoo.com"],
+      "bundle": "com.yahoo.Yahoo"
+    },
+    {
+      "id": "Bing",
+      "hosts": ["bing.com", "www.bing.com"],
+      "bundle": "com.microsoft.Bing"
+    },
+    {
+      "id": "Dropbox",
+      "hosts": ["dropbox.com", "www.dropbox.com"],
+      "bundle": "com.dropbox.Dropbox"
+    },
+    {
+      "id": "Slack",
+      "hosts": ["slack.com", "www.slack.com"],
+      "bundle": "com.slack.Slack"
+    },
+    {
+      "id": "Zoom",
+      "hosts": ["zoom.us", "www.zoom.us"],
+      "bundle": "us.zoom.Zoom"
+    },
+    {
+      "id": "GitHub",
+      "hosts": ["github.com", "www.github.com"],
+      "bundle": "com.github.GitHub"
+    },
+    {
+      "id": "GitLab",
+      "hosts": ["gitlab.com", "www.gitlab.com"],
+      "bundle": "com.gitlab.GitLab"
+    },
+    {
+      "id": "StackOverflow",
+      "hosts": ["stackoverflow.com", "www.stackoverflow.com"],
+      "bundle": "com.stackoverflow.StackOverflow"
+    },
+    {
+      "id": "Wikipedia",
+      "hosts": ["wikipedia.org", "www.wikipedia.org"],
+      "bundle": "org.wikipedia.Wikipedia"
+    },
+    {
+      "id": "Quora",
+      "hosts": ["quora.com", "www.quora.com"],
+      "bundle": "com.quora.Quora"
+    },
+    {
+      "id": "SoundCloud",
+      "hosts": ["soundcloud.com", "www.soundcloud.com"],
+      "bundle": "com.soundcloud.SoundCloud"
+    },
+    {
+      "id": "Etsy",
+      "hosts": ["etsy.com", "www.etsy.com"],
+      "bundle": "com.etsy.Etsy"
+    },
+    {
+      "id": "Dribbble",
+      "hosts": ["dribbble.com", "www.dribbble.com"],
+      "bundle": "com.dribbble.Dribbble"
+    },
+    {
+      "id": "Behance",
+      "hosts": ["behance.net", "www.behance.net"],
+      "bundle": "net.behance.Behance"
+    },
+    {
+      "id": "Flickr",
+      "hosts": ["flickr.com", "www.flickr.com"],
+      "bundle": "com.flickr.Flickr"
+    },
+    {
+      "id": "Tumblr",
+      "hosts": ["tumblr.com", "www.tumblr.com"],
+      "bundle": "com.tumblr.Tumblr"
+    },
+    {
+      "id": "Weebly",
+      "hosts": ["weebly.com", "www.weebly.com"],
+      "bundle": "com.weebly.Weebly"
+    },
+    {
+      "id": "WordPress",
+      "hosts": ["wordpress.com", "www.wordpress.com"],
+      "bundle": "com.wordpress.WordPress"
+    },
+    {
+      "id": "Shopify",
+      "hosts": ["shopify.com", "www.shopify.com"],
+      "bundle": "com.shopify.Shopify"
+    },
+    {
+      "id": "Adobe",
+      "hosts": ["adobe.com", "www.adobe.com"],
+      "bundle": "com.adobe.Adobe"
+    },
+    {
+      "id": "PayPal",
+      "hosts": ["paypal.com", "www.paypal.com"],
+      "bundle": "com.paypal.PayPal"
+    },
+    {
+      "id": "Stripe",
+      "hosts": ["stripe.com", "www.stripe.com"],
+      "bundle": "com.stripe.Stripe"
+    },
+    {
+      "id": "Notion",
+      "hosts": ["notion.so", "www.notion.so"],
+      "bundle": "so.notion.Notion"
+    },
+    {
+      "id": "Evernote",
+      "hosts": ["evernote.com", "www.evernote.com"],
+      "bundle": "com.evernote.Evernote"
+    },
+    {
+      "id": "Viber",
+      "hosts": ["viber.com", "www.viber.com"],
+      "bundle": "com.viber.Viber"
+    },
+    {
+      "id": "Signal",
+      "hosts": ["signal.org", "www.signal.org"],
+      "bundle": "org.signal.Signal"
+    },
+    {
+      "id": "Skype",
+      "hosts": ["skype.com", "www.skype.com"],
+      "bundle": "com.skype.Skype"
+    },
+    {
+      "id": "Trello",
+      "hosts": ["trello.com", "www.trello.com"],
+      "bundle": "com.trello.Trello"
+    }
+  ]
+}

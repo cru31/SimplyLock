@@ -1,0 +1,26 @@
+/* 
+  Localizable.strings
+  SimplyLock
+
+  Created by Duk-Jun Kim on 5/1/25.
+  
+*/
+
+// Localizable.strings (English)
+
+"auth_required_message" = "Screen Time API access is required.";
+"request_auth_button" = "Request Authorization";
+"main_screen_title" = "Main Screen";
+"auth_denied_message" = "Screen Time API access was denied.\nPlease allow permission in the Settings app.";
+"unknown_auth_status" = "Unknown authorization status.";
+
+
+
+
+// Localizable.strings (Korean)
+
+"auth_required_message" = "스크린 타임 API 접근 권한이 필요합니다.";
+"request_auth_button" = "권한 요청하기";
+"main_screen_title" = "기본 화면";
+"auth_denied_message" = "스크린 타임 API 접근이 거부되었습니다.\n설정 앱에서 권한을 허용해주세요.";
+"unknown_auth_status" = "알 수 없는 권한 상태입니다.";
