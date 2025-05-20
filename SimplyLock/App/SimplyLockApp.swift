@@ -2,6 +2,7 @@ import SwiftUI
 import UIKit
 @main
 struct SimplyLockApp: App {
+    @StateObject private var blockManager = BlockManager.shared
     @StateObject private var themeManager = ThemeManager.shared
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.scenePhase) private var scenePhase
@@ -9,6 +10,7 @@ struct SimplyLockApp: App {
         WindowGroup {
             MainTabView()
                 .environmentObject(themeManager)
+                .environmentObject(blockManager)
                 .onAppear {
                     // 앱 시작 시 테마 설정
                     updateThemeBasedOnSystemColorScheme(colorScheme)

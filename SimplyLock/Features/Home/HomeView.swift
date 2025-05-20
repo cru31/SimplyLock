@@ -5,14 +5,15 @@ struct HomeView: View {
     @State private var showPomodoro = false
     @State private var showEmergency = false
     @EnvironmentObject private var themeManager: ThemeManager
+    @EnvironmentObject private var blockManager: BlockManager
     
     var body: some View {
         withTheme { theme in
             ScrollView {
                 VStack(spacing: 16) {
-                    // 헤더 영역
+                    // 상단 헤더
                     HStack {
-                        Text("앱블록")
+                        Text("심플락")
                             .font(.system(size: 24, weight: .bold))
                             .foregroundColor(theme.primaryTextColor)
                         
@@ -28,26 +29,18 @@ struct HomeView: View {
                         }
                     }
                     
-                    // 현재 상태 카드
-                    StatusCard(
-                        title: "현재 상태",
-                        subtitle: "학습 모드 활성화 중",
-                        iconName: "lock.shield.fill",
-                        tags: ["SNS 차단", "게임 차단", "+2개"],
-                        backgroundColor: Color.blue.opacity(0.2),  // 다크 모드에서는 약간 더 진하게
-                        iconColor: .blue,
-                        textColor: .blue
-                    )
+                    // 현재 차단 상태 카드
+                    StatusCard()
+                        .environmentObject(blockManager)
                     
-                    
-                    // 빠른 액션 버튼 그룹
+                    // 빠른 액션 그리드
                     QuickActionGrid(
                         strictMode: $strictMode,
                         onPomodoroTap: showPomodoroSettings,
                         onEmergencyTap: showEmergencyAccess
                     )
                     
-                    // 오늘의 통계 요약
+                    // 오늘의 통계 섹션
                     VStack(alignment: .leading, spacing: 12) {
                         Text("오늘의 통계")
                             .font(.system(size: 18, weight: .semibold))
@@ -70,9 +63,9 @@ struct HomeView: View {
                         }
                     }
                     
-                    // 목표 진행률
+                    // 목표 진행율
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("목표 진행률")
+                        Text("목표 진행율")
                             .font(.system(size: 18, weight: .semibold))
                             .foregroundColor(theme.primaryTextColor)
                         
@@ -85,8 +78,8 @@ struct HomeView: View {
                         title: "최근 활동"
                     )
                     
-                    // 앱 팁
-                    TipCard(tip: "Strict Mode를 활성화하면 설정한 시간 동안 차단을 해제할 수 없어요. 중요한 일이 있을 때는 '긴급 액세스'를 사용하세요.")
+                    // 팁 카드
+                    TipCard(tip: "Strict Mode를 활성화하면 설정한 시간 동안 차단을 해제할 수 없습니다. 선택적 앱이 있을 때는 '긴급 액세스'를 사용하세요.")
                 }
                 .padding()
             }
@@ -98,7 +91,6 @@ struct HomeView: View {
                 EmergencyAccessView(isPresented: $showEmergency)
             }
         }
-        //.adaptToThemeColorScheme()
     }
     
     func showPomodoroSettings() {
@@ -338,9 +330,10 @@ struct EmergencyAccessView: View {
 #Preview {
     HomeView()
         .environmentObject(ThemeManager.shared)
+        .environmentObject(BlockManager.shared)
 }
 
-// 다크 모드 프리뷰
+// 다크 모드 테스트
 struct HomeViewDarkPreview: PreviewProvider {
     static var previews: some View {
         let themeManager = ThemeManager.shared
@@ -350,6 +343,7 @@ struct HomeViewDarkPreview: PreviewProvider {
         
         return HomeView()
             .environmentObject(themeManager)
+            .environmentObject(BlockManager.shared)
             .preferredColorScheme(.dark)
     }
 }

@@ -48,65 +48,6 @@ struct StatCard: View {
     }
 }
 
-struct StatusCard: View {
-    let title: String
-    let subtitle: String
-    let iconName: String
-    let tags: [String]
-    let backgroundColor: Color
-    let iconColor: Color
-    let textColor: Color
-    @EnvironmentObject private var themeManager: ThemeManager
-    
-    var body: some View {
-        withTheme { theme in
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(title)
-                            .font(.system(size: 18, weight: .semibold))
-                            .foregroundColor(textColor)
-                        
-                        Text(subtitle)
-                            .font(.system(size: 16))
-                            .foregroundColor(textColor.opacity(0.8))
-                    }
-                    
-                    Spacer()
-                    
-                    Image(systemName: iconName)
-                        .font(.system(size: 32))
-                        .foregroundColor(iconColor)
-                }
-                
-                HStack(spacing: 8) {
-                    ForEach(tags, id: \.self) { tag in
-                        Text(tag)
-                            .font(.system(size: 12, weight: .medium))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(textColor.opacity(0.2))
-                            .foregroundColor(textColor)
-                            .cornerRadius(theme.cornerRadius / 1.5)
-                    }
-                }
-            }
-            .padding()
-            .background(
-                RoundedRectangle(cornerRadius: theme.cornerRadius)
-                    .fill(backgroundColor)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: theme.cornerRadius)
-                    .stroke(theme.primaryColor.opacity(0.5), lineWidth: 1)
-            )
-            .onAppear {
-                print("-------------------- StatusCard body called, theme: \(themeManager.currentThemeId), title: \(title)")
-            }
-        }
-    }
-}
-
 struct GoalProgressCard: View {
     let goal: Goal
     @EnvironmentObject private var themeManager: ThemeManager
@@ -183,17 +124,6 @@ struct GoalProgressCard: View {
                 subtitle: "주로 소셜 미디어 앱"
             )
         }
-        
-        StatusCard(
-            title: "현재 상태",
-            subtitle: "학습 모드 활성화 중",
-            iconName: "shield.fill",
-            tags: ["SNS 차단", "게임 차단", "+2개"],
-            backgroundColor: Color.blue.opacity(0.1),
-            iconColor: .blue,
-            textColor: .blue
-        )
-        
         GoalProgressCard(goal: Goal.sample)
 }
     .padding()
@@ -225,16 +155,6 @@ struct CardComponentsDarkPreview: PreviewProvider {
                     subtitle: "주로 소셜 미디어 앱"
                 )
             }
-            
-            StatusCard(
-                title: "현재 상태",
-                subtitle: "학습 모드 활성화 중",
-                iconName: "shield.fill",
-                tags: ["SNS 차단", "게임 차단", "+2개"],
-                backgroundColor: Color.blue.opacity(0.2),  // 다크 모드에서는 약간 더 진하게
-                iconColor: .blue,
-                textColor: .blue
-            )
             
             GoalProgressCard(goal: Goal.sample)
         }
