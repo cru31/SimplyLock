@@ -1,0 +1,48 @@
+@startuml Sequence Diagram: UC-3 - Review Usage Insights (Conceptual)
+
+!theme vibrant
+
+actor User
+participant "InsightsView" as IV
+participant "UsageDataFetcher" as UDF
+note right of UDF #Technology: (Conceptual: Represents future
+integration with DeviceActivityCenter)
+participant "DeviceActivityCenter" as DAC <<Apple Framework>>
+
+skinparam sequenceMessageAlign center
+
+User -> IV : Navigate to Insights screen
+activate IV
+
+IV -> IV : Request usage data (e.g., for "Today")
+IV -> UDF : fetchUsageData(forRange: "Today")
+    activate UDF
+    UDF -> DAC : startMonitoring() / requestReport() 
+    note right of UDF #LightYellow: Actual interaction with DAC is complex,\involves asynchronous data reporting. This is simplified.
+    activate DAC
+    DAC --> UDF : Return aggregated usage data (async)
+    deactivate DAC
+    UDF -> UDF : Process & prepare data for display
+    UDF --> IV : Return displayable UsageData model
+    deactivate UDF
+
+IV -> User : Display charts and statistics based on UsageData
+deactivate IV
+
+' User changes time range
+User -> IV : Select "This Week" time range
+activate IV
+IV -> UDF : fetchUsageData(forRange: "This Week")
+    activate UDF
+    UDF -> DAC : requestReport(forDateInterval) ' Or similar DAC call
+    activate DAC
+    DAC --> UDF : Return new aggregated data (async)
+    deactivate DAC
+    UDF -> UDF : Process & prepare new data
+    UDF --> IV : Return updated UsageData model
+    deactivate UDF
+IV -> User : Update charts and statistics
+deactivate IV
+
+@enduml
+```

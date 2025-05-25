@@ -15,9 +15,23 @@ final class BlockMonitor: DeviceActivityMonitor {
     /// 차단 세션 시작 – Extension이 활성화되는 즉시 호출됨
     override func intervalDidStart(for activity: DeviceActivityName) {
         // DeviceActivityMonitor는 백그라운드에서 호출되므로 MainActor 전환 필요
-        Task { @MainActor in                         // ② MainActor 블록
-            if let profile = BlockManager.shared.profiles.first {
-                try? await BlockManager.shared.startBlocking(with: profile)
+        Task { @MainActor in
+            guard let userInfo = activity.event?.userInfo,
+                  let profileIDString = userInfo["profileID"] as? String,
+                  let profileUUID = UUID(uuidString: profileIDString) else {
+                print("BlockMonitor: Could not start blocking session due to missing or invalid profileID in schedule event.")
+                return
+            }
+            
+            if let profileToBlock = BlockManager.shared.getProfile(byId: profileUUID) {
+                do {
+                    print("BlockMonitor: Starting blocking with profile: \(profileToBlock.name) (ID: \(profileToBlock.id))")
+                    try await BlockManager.shared.startBlocking(with: profileToBlock)
+                } catch {
+                    print("BlockMonitor: Error starting blocking session for profile ID \(profileUUID): \(error)")
+                }
+            } else {
+                print("BlockMonitor: Profile with ID \(profileUUID) not found. Cannot start blocking.")
             }
         }
     }

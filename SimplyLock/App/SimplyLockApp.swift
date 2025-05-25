@@ -37,6 +37,7 @@ struct SimplyLockApp: App {
     @StateObject private var blockManager = BlockManager.shared
     @StateObject private var themeManager = ThemeManager.shared
     @StateObject private var coordinator = PermissionCoordinator()
+    @StateObject private var profileStore = ProfileStore() // Added ProfileStore
     
     @State private var showPermissionGuide = false
     @State private var isInitializing = true
@@ -54,6 +55,7 @@ struct SimplyLockApp: App {
                                 .environmentObject(themeManager)
                                 .environmentObject(blockManager)
                                 .environmentObject(coordinator)
+                                .environmentObject(profileStore) // Injected ProfileStore
                                 .onAppear {
                                     updateThemeBasedOnSystemColorScheme(colorScheme)
                                     Task {

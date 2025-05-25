@@ -1,0 +1,76 @@
+@startuml Sequence Diagram: UC-2 - Use Pomodoro Timer with Linked Profile
+
+!theme vibrant
+
+actor User
+participant "TimerView" as TV
+participant "ProfilePicker" as PP <<Sheet/Inline>> 
+note right of PP: (ProfileSelectionSheet or similar)
+participant "ProfileStore" as PS
+participant "BlockManager" as BM
+participant "ManagedSettingsStore" as MSS <<Apple Framework>>
+
+skinparam sequenceMessageAlign center
+
+User -> TV : Navigate to Timer screen
+activate TV
+
+' Optional: Link a profile if not already done or to change
+User -> TV : Tap "Link Blocking Profile" toggle (to enable)
+User -> TV : Tap "Select Profile" button
+TV -> PP : Present Profile Picker
+    activate PP
+    PP -> PS : Get customProfiles
+    PP -> PS : Get systemProfiles (Profile.samples)
+    PS --> PP : Return profiles
+    PP -> User : Display profile list
+    User -> PP : Select a profile
+    PP --> TV : Update linkedProfileID
+    deactivate PP
+TV -> User : UI updated (shows linked profile name)
+
+' Start Timer
+User -> TV : Tap "Start Focus Timer"
+activate TV
+TV -> TV : Check if profile linked & active
+alt Profile is linked and active
+    TV -> PS : Get Profile (using linkedProfileID)
+    activate PS
+    PS --> TV : Return selected Profile
+    deactivate PS
+    TV -> BM : startBlocking(BlockProfile)
+        note right of TV #Business: Duration = Timer's focus session duration
+        activate BM
+        BM -> BM : Set activeProfile, isBlocking=true, timer
+        BM -> MSS : Apply shield settings
+        activate MSS
+        MSS --> BM : Settings applied
+        deactivate MSS
+        BM --> TV : Return (async)
+        deactivate BM
+end
+TV -> TV : Start Pomodoro countdown timer
+TV -> User : UI shows timer running (and block active if linked)
+deactivate TV
+
+
+' Later, when timer session ends or is stopped
+User -> TV : (Timer ends or User taps "Stop")
+activate TV
+TV -> TV : Stop Pomodoro countdown
+alt Blocking was active for this timer session
+    TV -> BM : stopBlocking()
+        activate BM
+        BM -> MSS : Clear shield settings
+        activate MSS
+        MSS --> BM : Settings cleared
+        deactivate MSS
+        BM -> BM : Reset activeProfile, isBlocking=false
+        BM --> TV : Return
+        deactivate BM
+end
+TV -> User : UI shows timer stopped (and block inactive)
+deactivate TV
+
+@enduml
+```

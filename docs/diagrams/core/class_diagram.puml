@@ -1,0 +1,164 @@
+@startuml SimplyLock Class Diagram
+
+!theme vibrant
+
+' Packages for grouping
+package "App Entry & Navigation" <<Frame>> {
+    class SimplyLockApp [[SimplyLock/App/SimplyLockApp.swift]] {
+        + blockManager: BlockManager
+        + themeManager: ThemeManager
+        + coordinator: PermissionCoordinator
+        + profileStore: ProfileStore
+    }
+    SimplyLockApp ..> MainTabView
+
+    class MainTabView [[SimplyLock/App/MainTabView.swift]] {
+        + selectedTab: Tab
+    }
+    MainTabView ..> HomeView
+    MainTabView ..> ProfilesView
+    MainTabView ..> InsightsView
+    MainTabView ..> TimerView
+    MainTabView ..> SettingsView
+}
+
+package "Features (UI Views)" <<Frame>> {
+    package "Home" <<Folder>> {
+        class HomeView [[SimplyLock/Features/Home/HomeView.swift]]
+    }
+    package "Profiles" <<Folder>> {
+        class ProfilesView [[SimplyLock/Features/Profiles/ProfilesView.swift]] {
+            + profileStore: ProfileStore
+        }
+        ProfilesView ..> ProfileEditorView
+        ProfilesView ..> ProfileCard
+        class ProfileEditorView [[SimplyLock/Features/Profiles/ProfilesView.swift]] {
+            + profileStore: ProfileStore
+            + activitySelection: FamilyActivitySelection
+        }
+        ProfileEditorView ..> FamilyActivityPicker
+    }
+    package "Insights" <<Folder>> {
+        class InsightsView [[SimplyLock/Features/Insights/InsightsView.swift]]
+    }
+    package "Timer" <<Folder>> {
+        class TimerView [[SimplyLock/Features/Timer/TimerView.swift]] {
+            + blockManager: BlockManager
+            + profileStore: ProfileStore
+            + linkedProfileID: UUID?
+        }
+        TimerView ..> TimerSettingsView
+    }
+    package "Settings" <<Folder>> {
+        class SettingsView [[SimplyLock/Features/Settings/SettingsView.swift]]
+    }
+}
+
+package "Reusable UI Components" <<Cloud>> {
+    class ProfileCard [[SimplyLock/Components/ProfileCard.swift]] {
+        + profile: Profile
+    }
+    class FamilyActivityPicker [[https://developer.apple.com/documentation/familycontrols/familyactivitypicker]] #LightGray
+    note right of FamilyActivityPicker: Apple Framework
+}
+
+package "Data Models" <<Storage>> {
+    class Profile [[SimplyLock/Models/Profile.swift]] {
+        + id: UUID
+        + name: String
+        + activitySelection: FamilyActivitySelection
+        + codableIconBackgroundColor: CodableColor
+        + isSystem: Bool
+    }
+    Profile *-- "1" FamilyActivitySelection
+
+    class BlockProfile [[Shared/BlockManager.swift]] {
+        + id: UUID
+        + name: String
+        + selection: FamilyActivitySelection
+        + duration: TimeInterval
+    }
+    BlockProfile *-- "1" FamilyActivitySelection
+
+    class FamilyActivitySelection [[https://developer.apple.com/documentation/familycontrols/familyactivityselection]] #LightGray
+    note right of FamilyActivitySelection: Apple Framework
+}
+
+package "Managers & Core Logic" <<Node>> {
+    class ProfileStore [[SimplyLock/Managers/ProfileStore.swift]] {
+        + customProfiles: [Profile]
+        + addProfile(Profile)
+        + updateProfile(Profile)
+        + deleteProfile(Profile)
+        + loadCustomProfiles()
+        + saveCustomProfiles()
+    }
+    ProfileStore o-- "*" Profile
+
+    class BlockManager [[Shared/BlockManager.swift]] {
+        + activeProfile: BlockProfile?
+        + isBlocking: Bool
+        + timeRemaining: TimeInterval
+        + startBlocking(BlockProfile)
+        + stopBlocking()
+        + getProfile(byId: UUID): BlockProfile?
+    }
+    BlockManager o-- BlockProfile
+    BlockManager ..> ManagedSettingsStore
+
+    class ThemeManager [[SimplyLock/Managers/ThemeManager.swift]] {
+        + currentTheme: AppTheme
+        + setTheme(id: String)
+    }
+
+    class PermissionCoordinator [[SimplyLock/Managers/Permission/PermissionCoordinator.swift]] {
+        + checkAllPermissions()
+        + manager(for: PermissionType): PermissionManagerProtocol
+    }
+}
+
+package "System Integration & Extensions" <<System>> {
+    class ManagedSettingsStore [[https://developer.apple.com/documentation/managedsettings/managedsettingsstore]] #LightGray
+    note right of ManagedSettingsStore: Apple Framework
+
+    class DeviceActivityMonitor [[https://developer.apple.com/documentation/deviceactivity/deviceactivitymonitor]] #LightGray
+    note right of DeviceActivityMonitor: Apple Framework
+
+    class BlockMonitor [[BlockMonitor/BlockMonitor.swift]] extends DeviceActivityMonitor {
+        + intervalDidStart(DeviceActivityName)
+        + intervalDidEnd(DeviceActivityName)
+    }
+    BlockMonitor ..> BlockManager
+
+    class ShieldConfigurationDataSource [[https://developer.apple.com/documentation/managedsettingsui/shieldconfigurationdatasource]] #LightGray
+    note right of ShieldConfigurationDataSource: Apple Framework
+
+    class ShieldConfigurationExtension [[BlockMonitorShield/ShieldConfigurationExtension.swift]] extends ShieldConfigurationDataSource {
+        + configuration(for: ShieldContext): ShieldConfiguration
+    }
+}
+
+' Relationships between packages/major components
+SimplyLockApp --> ProfileStore
+SimplyLockApp --> BlockManager
+SimplyLockApp --> ThemeManager
+SimplyLockApp --> PermissionCoordinator
+
+ProfilesView --> ProfileStore
+ProfilesView --> BlockManager ' Via DurationPickerView -> onStart
+TimerView --> BlockManager
+TimerView --> ProfileStore
+
+HomeView ..> BlockManager ' For status display
+
+' Dependency notes
+note "SimplyLockApp initializes and injects managers into the environment." as AppInitNote
+SimplyLockApp .. AppInitNote
+
+note "Views observe managers (e.g., via @EnvironmentObject or direct calls to .shared instances)." as ViewManagerNote
+HomeView .. ViewManagerNote
+ProfilesView .. ViewManagerNote
+TimerView .. ViewManagerNote
+
+@enduml
+```
