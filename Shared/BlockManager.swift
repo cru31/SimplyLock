@@ -56,6 +56,7 @@ public final class BlockManager: ObservableObject {
             print("BlockManager: Failed to initialize UserDefaults for group.io.cru31.SimplyLock")
         }
         
+        /*
         // Load default profiles first
         loadDefaultProfiles()
         
@@ -64,6 +65,7 @@ public final class BlockManager: ObservableObject {
             self.loadProfiles()
             self.loadCurrentProfile()
         }
+         */
     }
     
     // MARK: - Default Profiles

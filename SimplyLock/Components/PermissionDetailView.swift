@@ -179,7 +179,7 @@ struct PermissionDetailView: View {
                     await manager.checkAuthorizationStatus()
                     await MainActor.run {
                         isRequestingPermission = false
-                        if manager.currentStatus == .authorized {
+                        if manager.currentStatus == .authorized || manager.currentStatus == .provisional {
                             showSuccess = true
                         } else {
                             showError = true
