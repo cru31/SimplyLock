@@ -56,7 +56,6 @@ public final class BlockManager: ObservableObject {
             print("BlockManager: Failed to initialize UserDefaults for group.io.cru31.SimplyLock")
         }
         
-        /*
         // Load default profiles first
         loadDefaultProfiles()
         
@@ -65,7 +64,6 @@ public final class BlockManager: ObservableObject {
             self.loadProfiles()
             self.loadCurrentProfile()
         }
-         */
     }
     
     // MARK: - Default Profiles
@@ -178,6 +176,10 @@ public final class BlockManager: ObservableObject {
             shared.set(data, forKey: keyProfiles)
             shared.synchronize() // Ensure data is written
         }
+    }
+
+    public func getProfile(byId id: UUID) -> BlockProfile? {
+        return profiles.first(where: { $0.id == id })
     }
     
     private func loadProfiles() {

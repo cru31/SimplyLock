@@ -9,6 +9,14 @@ struct TimerView: View {
     @State private var linkedProfileActive = true
     @EnvironmentObject private var themeManager: ThemeManager
     
+    // Added EnvironmentObjects
+    @EnvironmentObject var blockManager: BlockManager
+    @EnvironmentObject var profileStore: ProfileStore
+
+    // State for Linked Profile
+    @State private var linkedProfileID: UUID? = nil
+    @State private var showingProfileSelectionSheet = false
+    
     // 세션 기록 데이터
     let sessionHistory = Activity.sessionHistory
     
@@ -104,28 +112,40 @@ struct TimerView: View {
                                 Toggle("", isOn: $linkedProfileActive)
                                     .labelsHidden()
                                     .toggleStyle(CustomToggleStyle(theme: theme, isOn: linkedProfileActive))
+                                    .onChange(of: linkedProfileActive) { _, newValue in
+                                        if !newValue && isRunning && blockManager.isBlocking {
+                                            // If toggle is turned off, timer is running, and a block is active
+                                            print("TimerView: Linked profile toggle turned off. Stopping block.")
+                                            blockManager.stopBlocking()
+                                        }
+                                    }
                             }
                             
                             if linkedProfileActive {
-                                Button(action: {}) {
+                                Button(action: {
+                                    if linkedProfileActive { // Only show if toggle is on
+                                        showingProfileSelectionSheet = true
+                                    }
+                                }) {
                                     HStack {
-                                        // 프로필 아이콘
+                                        // 프로필 아이콘 (Dynamic based on selected profile)
+                                        let currentProfile = getCurrentLinkedProfile()
                                         ZStack {
                                             RoundedRectangle(cornerRadius: 8)
-                                                .fill(Color.purple)
+                                                .fill(currentProfile?.iconBackgroundColor ?? theme.secondaryTextColor.opacity(0.3))
                                                 .frame(width: 32, height: 32)
                                             
-                                            Image(systemName: "lock.fill")
+                                            Image(systemName: currentProfile?.iconName ?? "questionmark.circle")
                                                 .font(.system(size: 16))
-                                                .foregroundColor(.white)
+                                                .foregroundColor(currentProfile != nil ? .white : theme.secondaryTextColor)
                                         }
                                         
                                         VStack(alignment: .leading, spacing: 2) {
-                                            Text("완전 집중")
+                                            Text(currentProfile?.name ?? "프로필 선택")
                                                 .font(.system(size: 16, weight: .medium))
                                                 .foregroundColor(theme.primaryTextColor)
                                             
-                                            Text("타이머 실행 중 활성화")
+                                            Text(currentProfile != nil ? "타이머 실행 중 활성화" : "탭하여 프로필 선택")
                                                 .font(.system(size: 12))
                                                 .foregroundColor(theme.secondaryTextColor)
                                         }
@@ -140,6 +160,7 @@ struct TimerView: View {
                                     .background(theme.buttonBackgroundColor)
                                     .cornerRadius(theme.cornerRadius)
                                 }
+                                .disabled(!linkedProfileActive) // Disable button if toggle is off
                             }
                         }
                         .padding()
@@ -182,17 +203,129 @@ struct TimerView: View {
             .sheet(isPresented: $showSettings) {
                 TimerSettingsView(isPresented: $showSettings)
             }
+            .sheet(isPresented: $showingProfileSelectionSheet) {
+                // Inline Profile Selection Sheet
+                NavigationView {
+                    List {
+                        Section(header: Text("기본 프로필").foregroundColor(themeManager.currentTheme.secondaryTextColor)) {
+                            ForEach(Profile.samples.filter { $0.isSystem }) { profile in
+                                Button(action: {
+                                    linkedProfileID = profile.id
+                                    showingProfileSelectionSheet = false
+                                }) {
+                                    profileRow(profile: profile, theme: themeManager.currentTheme)
+                                }
+                            }
+                        }
+                        
+                        Section(header: Text("사용자 정의 프로필").foregroundColor(themeManager.currentTheme.secondaryTextColor)) {
+                            if profileStore.customProfiles.filter({ !$0.isSystem }).isEmpty {
+                                Text("사용자 정의 프로필이 없습니다.")
+                                    .foregroundColor(themeManager.currentTheme.secondaryTextColor)
+                            } else {
+                                ForEach(profileStore.customProfiles.filter { !$0.isSystem }) { profile in
+                                    Button(action: {
+                                        linkedProfileID = profile.id
+                                        showingProfileSelectionSheet = false
+                                    }) {
+                                        profileRow(profile: profile, theme: themeManager.currentTheme)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .listStyle(InsetGroupedListStyle())
+                    .background(themeManager.currentTheme.backgroundColor.ignoresSafeArea())
+                    .navigationTitle("프로필 선택")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarTrailing) {
+                            Button("취소") {
+                                showingProfileSelectionSheet = false
+                            }
+                            .foregroundColor(themeManager.currentTheme.primaryColor)
+                        }
+                    }
+                }
+                .environmentObject(themeManager) // Ensure theme is available in the sheet
+                .preferredColorScheme(themeManager.currentTheme.colorScheme)
+            }
         }
+    }
+
+    private func profileRow(profile: Profile, theme: AppTheme) -> some View {
+        HStack {
+            ZStack {
+                Circle()
+                    .fill(profile.iconBackgroundColor.opacity(0.2))
+                    .frame(width: 40, height: 40)
+                Image(systemName: profile.iconName)
+                    .foregroundColor(profile.iconBackgroundColor)
+            }
+            VStack(alignment: .leading) {
+                Text(profile.name)
+                    .foregroundColor(theme.primaryTextColor)
+                Text("\(profile.appCount) 앱, \(profile.websiteCount) 웹사이트")
+                    .font(.caption)
+                    .foregroundColor(theme.secondaryTextColor)
+            }
+            Spacer()
+            if linkedProfileID == profile.id {
+                Image(systemName: "checkmark")
+                    .foregroundColor(theme.primaryColor)
+            }
+        }
+        .contentShape(Rectangle()) // Make the whole row tappable
+    }
+
+    private func getCurrentLinkedProfile() -> Profile? {
+        guard let id = linkedProfileID else { return nil }
+        if let profile = profileStore.customProfiles.first(where: { $0.id == id }) {
+            return profile
+        }
+        return Profile.samples.first(where: { $0.id == id })
     }
     
     private func toggleTimer() {
         isRunning.toggle()
+        
+        if isRunning {
+            // Timer starts
+            if linkedProfileActive, let profileID = linkedProfileID {
+                if let profileToBlock = getCurrentLinkedProfile() { // Use helper to get full Profile
+                    let blockProfile = BlockProfile(
+                        id: profileToBlock.id, // Use original profile ID for consistency if needed
+                        name: "Timer: \(profileToBlock.name)",
+                        selection: profileToBlock.activitySelection,
+                        duration: TimeInterval(timeLeft), // Use current timeLeft for duration
+                        isPreset: profileToBlock.isSystem
+                    )
+                    Task {
+                        print("TimerView: Starting block with profile '\(blockProfile.name)' for \(blockProfile.duration) seconds.")
+                        try? await blockManager.startBlocking(with: blockProfile)
+                    }
+                } else {
+                     print("TimerView Error: Could not find profile with ID \(profileID) to start blocking.")
+                }
+            }
+        } else {
+            // Timer stops or is paused
+            if blockManager.isBlocking {
+                print("TimerView: Stopping block as timer is no longer running.")
+                blockManager.stopBlocking()
+            }
+        }
         // 실제 구현에서는 Timer를 사용하여 timeLeft를 업데이트
     }
     
     private func resetTimer() {
         isRunning = false
-        timeLeft = isBreak ? 5 * 60 : 25 * 60
+        timeLeft = isBreak ? 5 * 60 : 25 * 60 // Reset to current mode's full time
+        
+        if blockManager.isBlocking {
+            print("TimerView: Stopping block due to timer reset.")
+            blockManager.stopBlocking()
+        }
     }
     
     private func toggleNotifications() {
@@ -241,6 +374,7 @@ struct TimerSettingsView: View {
     @State private var soundEnabled = true
     @State private var vibrationEnabled = true
     @EnvironmentObject private var themeManager: ThemeManager
+    @EnvironmentObject var profileStore: ProfileStore // Added for future use
     
     var body: some View {
         withTheme { theme in
