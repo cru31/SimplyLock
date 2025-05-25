@@ -145,11 +145,11 @@ SimplyLockApp --> ThemeManager
 SimplyLockApp --> PermissionCoordinator
 
 ProfilesView --> ProfileStore
-ProfilesView --> BlockManager
+ProfilesView --> BlockManager ' Via DurationPickerView -> onStart
 TimerView --> BlockManager
 TimerView --> ProfileStore
 
-HomeView ..> BlockManager
+HomeView ..> BlockManager ' For status display
 
 ' Dependency notes
 note "SimplyLockApp initializes and injects managers into the environment." as AppInitNote
@@ -161,3 +161,4 @@ ProfilesView .. ViewManagerNote
 TimerView .. ViewManagerNote
 
 @enduml
+```
