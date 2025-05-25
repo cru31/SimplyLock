@@ -10,6 +10,7 @@
 		040950592DC5321200D290CE /* ManagedSettings.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 040950582DC5321200D290CE /* ManagedSettings.framework */; };
 		0409505B2DC5321200D290CE /* ManagedSettingsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0409505A2DC5321200D290CE /* ManagedSettingsUI.framework */; };
 		040950632DC5321200D290CE /* BlockMonitorShield.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 040950572DC5321200D290CE /* BlockMonitorShield.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		04D04FF42DDCE5F7009E636C /* DefaultProfiles.json in Resources */ = {isa = PBXBuildFile; fileRef = 04D04FF32DDCE5F1009E636C /* DefaultProfiles.json */; };
 		04D3A95B2DC29D5400001F2F /* DeviceActivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 04D3A95A2DC29D5400001F2F /* DeviceActivity.framework */; };
 		04D3A9632DC29D5400001F2F /* BlockMonitor.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 04D3A9582DC29D5400001F2F /* BlockMonitor.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		04D3A96C2DC2A00700001F2F /* BlockManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D3A9522DC29C5300001F2F /* BlockManager.swift */; };
@@ -56,6 +57,7 @@
 		040950572DC5321200D290CE /* BlockMonitorShield.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BlockMonitorShield.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		040950582DC5321200D290CE /* ManagedSettings.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettings.framework; path = System/Library/Frameworks/ManagedSettings.framework; sourceTree = SDKROOT; };
 		0409505A2DC5321200D290CE /* ManagedSettingsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ManagedSettingsUI.framework; path = System/Library/Frameworks/ManagedSettingsUI.framework; sourceTree = SDKROOT; };
+		04D04FF32DDCE5F1009E636C /* DefaultProfiles.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = DefaultProfiles.json; sourceTree = "<group>"; };
 		04D3A9352DC2700700001F2F /* SimplyLock.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SimplyLock.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04D3A9452DC273E200001F2F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		04D3A9522DC29C5300001F2F /* BlockManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockManager.swift; sourceTree = "<group>"; };
@@ -197,6 +199,7 @@
 		04D3A9992DC4DA2900001F2F /* Resouces */ = {
 			isa = PBXGroup;
 			children = (
+				04D04FF32DDCE5F1009E636C /* DefaultProfiles.json */,
 				04D3A99A2DC4DA3000001F2F /* BundleHostsMappings.json */,
 				04D3A9442DC273E200001F2F /* Localizable.strings */,
 			);
@@ -329,6 +332,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04D04FF42DDCE5F7009E636C /* DefaultProfiles.json in Resources */,
 				04D3A99C2DC4DAEB00001F2F /* Localizable.strings in Resources */,
 				04D3A99B2DC4DAC600001F2F /* BundleHostsMappings.json in Resources */,
 			);

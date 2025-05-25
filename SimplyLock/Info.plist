@@ -3,6 +3,10 @@
 <plist version="1.0">
 <dict>
     <key>NSFamilyControlsUsageDescription</key>
-    <string>This app needs Family Controls to allow you to manage and restrict apps and websites for your profile.</string>
+    <string>We need ScreenTime access to block apps and websites.</string>
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>We need your location for location-based automation.</string>
+    <key>NSUserNotificationsUsageDescription</key>
+    <string>We need to send notifications for alerts and reminders.</string>
 </dict>
 </plist>

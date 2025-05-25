@@ -1,15 +1,5 @@
-//
-//  BlockManager.swift
-//  SimplyLock (Shared)
-//
-//  Rev 2025‑05‑03 — App & Extension 공용 버전
-//  - App Group(UserDefaults) 로 프로필 영속화
-//  - @MainActor 유지 → 스레드 안전 (Extension에서는 Task { @MainActor in … } 로 호출)
-//  - 카테고리 전체 차단 지원
-//
-
 import Foundation
-import FamilyControls           // FamilyActivitySelection
+import FamilyControls
 import ManagedSettings
 import Combine
 
@@ -18,15 +8,16 @@ public struct BlockProfile: Identifiable, Codable, Equatable {
     public let id: UUID
     public var name: String
     public var selection: FamilyActivitySelection
-    public var duration: TimeInterval          // 초 단위
+    public var duration: TimeInterval
     public var createdAt: Date
-    public fileprivate(set) var isPreset: Bool // 파일 내부에서만 씀
+    public fileprivate(set) var isPreset: Bool
     
     public init(id: UUID = .init(),
                 name: String,
                 selection: FamilyActivitySelection,
                 duration: TimeInterval,
-                isPreset: Bool = false) {
+                isPreset: Bool = false)
+    {
         self.id        = id
         self.name      = name
         self.selection = selection
@@ -42,27 +33,65 @@ public struct BlockProfile: Identifiable, Codable, Equatable {
 
 @MainActor
 public final class BlockManager: ObservableObject {
-    
-    // ───────── 상태 ─────────
     @Published public private(set) var profiles: [BlockProfile] = []
     @Published public private(set) var currentProfile: BlockProfile?
-    @Published public private(set) var activeProfile:  BlockProfile?
+    @Published public private(set) var activeProfile: BlockProfile?
     @Published public private(set) var isBlocking = false
     @Published public private(set) var expirationDate: Date?
     @Published public private(set) var timeRemaining: TimeInterval = 0
     
-    // ───────── 내부 ─────────
-    private let store  = ManagedSettingsStore()
+    private let store = ManagedSettingsStore()
     private var timer: AnyCancellable?
     
-    private let shared = UserDefaults(suiteName: "group.io.cru31.SimplyLock")
+    private let shared: UserDefaults?
     private let keyProfiles = "BlockProfiles"
-    private let keyCurrent  = "CurrentProfileID"
+    private let keyCurrent = "CurrentProfileID"
     
     public static let shared = BlockManager()
+    
     private init() {
-        loadProfiles()
-        loadCurrentProfile()
+        // Initialize UserDefaults safely
+        self.shared = UserDefaults(suiteName: "group.io.cru31.SimplyLock")
+        if shared == nil {
+            print("BlockManager: Failed to initialize UserDefaults for group.io.cru31.SimplyLock")
+        }
+        
+        // Load default profiles first
+        loadDefaultProfiles()
+        
+        // Delay UserDefaults access to ensure app group is ready
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.loadProfiles()
+            self.loadCurrentProfile()
+        }
+    }
+    
+    // MARK: - Default Profiles
+    private func loadDefaultProfiles() {
+        guard let url = Bundle.main.url(forResource: "DefaultProfiles", withExtension: "json") else {
+            print("BlockManager: DefaultProfiles.json not found in bundle")
+            return
+        }
+        
+        do {
+            let data = try Data(contentsOf: url)
+            let defaultProfiles = try JSONDecoder().decode([BlockProfile].self, from: data)
+            
+            if profiles.isEmpty {
+                profiles.append(contentsOf: defaultProfiles)
+                saveProfiles()
+            } else {
+                for defaultProfile in defaultProfiles {
+                    if !profiles.contains(where: { $0.id == defaultProfile.id }) {
+                        profiles.append(defaultProfile)
+                    }
+                }
+                saveProfiles()
+            }
+            print("BlockManager: Loaded \(defaultProfiles.count) default profiles")
+        } catch {
+            print("BlockManager: Failed to load DefaultProfiles.json: \(error)")
+        }
     }
     
     // MARK: - CRUD
@@ -100,22 +129,19 @@ public final class BlockManager: ObservableObject {
         
         store.clearAllSettings()
         
-        // ① 앱·도메인 토큰 차단
         store.shield.applications = p.selection.applicationTokens
-        store.shield.webDomains   = p.selection.webDomainTokens
+        store.shield.webDomains = p.selection.webDomainTokens
         
-        // ② 카테고리 전체 차단
-        let cats = p.selection.categoryTokens               // ← 하나뿐인 카테고리 토큰 Set
+        let cats = p.selection.categoryTokens
         if !cats.isEmpty {
-            store.shield.applicationCategories = .specific(cats)   // ✅ 래핑
-            store.shield.webDomainCategories   = .specific(cats)   // ✅ 동일 세트 재사용
+            store.shield.applicationCategories = .specific(cats)
+            store.shield.webDomainCategories = .specific(cats)
         }
         
-        // ③ 타이머·상태 갱신 (변경 없음)
-        activeProfile  = p
-        isBlocking     = true
+        activeProfile = p
+        isBlocking = true
         expirationDate = Date().addingTimeInterval(p.duration)
-        timeRemaining  = p.duration
+        timeRemaining = p.duration
         
         timer?.cancel()
         timer = Timer.publish(every: 1, on: .main, in: .common)
@@ -131,33 +157,56 @@ public final class BlockManager: ObservableObject {
     
     public func stopBlocking() {
         store.clearAllSettings()
-        timer?.cancel(); timer = nil
+        timer?.cancel()
+        timer = nil
         
-        isBlocking     = false
-        activeProfile  = nil
+        isBlocking = false
+        activeProfile = nil
         expirationDate = nil
-        timeRemaining  = 0
+        timeRemaining = 0
     }
     
     // MARK: - 영속성
     private func saveProfiles() {
+        guard let shared = shared else {
+            print("BlockManager: UserDefaults not available for saving profiles")
+            return
+        }
         if let data = try? JSONEncoder().encode(profiles) {
-            shared?.set(data, forKey: keyProfiles)
+            shared.set(data, forKey: keyProfiles)
+            shared.synchronize() // Ensure data is written
         }
     }
     
     private func loadProfiles() {
-        guard let data = shared?.data(forKey: keyProfiles),
-              let decoded = try? JSONDecoder().decode([BlockProfile].self, from: data)
-        else { return }
+        guard let shared = shared,
+              let data = shared.data(forKey: keyProfiles),
+              let decoded = try? JSONDecoder().decode([BlockProfile].self, from: data) else {
+            print("BlockManager: No profiles found in UserDefaults")
+            return
+        }
         profiles = decoded
     }
     
     private func loadCurrentProfile() {
-        guard let idStr = shared?.string(forKey: keyCurrent),
-              let uuid  = UUID(uuidString: idStr),
-              let prof  = profiles.first(where: { $0.id == uuid })
-        else { return }
+        guard let shared = shared,
+              let idStr = shared.string(forKey: keyCurrent),
+              let uuid = UUID(uuidString: idStr),
+              let prof = profiles.first(where: { $0.id == uuid }) else {
+            print("BlockManager: No current profile found")
+            return
+        }
         currentProfile = prof
+    }
+    
+    // MARK: - Debug Reset
+    public func resetUserDefaults() {
+        guard let shared = shared else { return }
+        shared.removePersistentDomain(forName: "group.io.cru31.SimplyLock")
+        shared.synchronize()
+        print("BlockManager: Reset UserDefaults for group.io.cru31.SimplyLock")
+        profiles.removeAll()
+        currentProfile = nil
+        loadDefaultProfiles()
     }
 }

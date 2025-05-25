@@ -8,6 +8,12 @@
 		<string>com.apple.ManagedSettingsUI.shield-configuration-service</string>
 		<key>NSExtensionPrincipalClass</key>
 		<string>$(PRODUCT_MODULE_NAME).ShieldConfigurationExtension</string>
+        <key>NSFamilyControlsUsageDescription</key>
+        <string>We need ScreenTime access to block apps and websites.</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>We need your location for location-based automation.</string>
+        <key>NSUserNotificationsUsageDescription</key>
+        <string>We need to send notifications for alerts and reminders.</string>
 	</dict>
 </dict>
 </plist>
