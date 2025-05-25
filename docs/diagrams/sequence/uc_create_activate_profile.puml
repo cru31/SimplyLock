@@ -1,0 +1,62 @@
+@startuml Sequence Diagram: UC-1 - Create and Activate Profile
+
+!theme vibrant
+
+actor User
+participant "ProfilesView" as PV
+participant "ProfileEditorView" as PEV
+participant "FamilyActivityPicker" as FAP_Apple <<Apple Framework>>
+participant "ProfileStore" as PS
+participant "DurationPickerView" as DPV
+participant "BlockManager" as BM
+participant "ManagedSettingsStore" as MSS <<Apple Framework>>
+
+skinparam sequenceMessageAlign center
+
+User -> PV : Tap "Add New Profile (+)"
+activate PV
+PV -> PEV : new(profileStore)
+activate PEV
+PEV -> User : Show Profile Editor UI
+User -> PEV : Enter profile name, desc, icon, color
+User -> PEV : Tap "Select Apps/Websites"
+PEV -> FAP_Apple : Present FamilyActivityPicker(selection: $activitySelection)
+activate FAP_Apple
+FAP_Apple -> User : Show App/Website Selection UI
+User -> FAP_Apple : Make selections
+FAP_Apple --> PEV : Update $activitySelection
+deactivate FAP_Apple
+User -> PEV : Tap "Save"
+PEV -> PS : addProfile(newProfile)
+    activate PS
+    PS -> PS : Save customProfiles to UserDefaults
+    PS --> PEV : Return
+    deactivate PS
+PEV --> PV : Dismiss editor
+deactivate PEV
+PV -> User : Display updated profile list
+
+PV -> User : Profile list updated
+User -> PV : Select created profile & Tap Toggle/Activate
+activate PV
+PV -> DPV : new(profileToActivate, $selectedDuration)
+activate DPV
+DPV -> User : Show Duration Picker UI
+User -> DPV : Select duration
+User -> DPV : Tap "Start Blocking"
+DPV -> BM : startBlocking(BlockProfile)
+    activate BM
+    BM -> BM : Set activeProfile, isBlocking=true, timer
+    BM -> MSS : Apply shield settings (applications, webDomains, categories)
+    activate MSS
+    MSS --> BM : Settings applied
+    deactivate MSS
+    BM --> DPV : Return (async)
+    deactivate BM
+DPV --> PV : Dismiss duration picker (onStart closure)
+deactivate DPV
+PV -> User : UI updated (profile shown as active)
+deactivate PV
+
+@enduml
+```
