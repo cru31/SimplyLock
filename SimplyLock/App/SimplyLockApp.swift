@@ -86,10 +86,10 @@ struct SimplyLockApp: App {
                                 
                                 PermissionGuideView(
                                     requiredManagers: [
-                                        coordinator.manager(for: .screenTime)!
+                                        coordinator.manager(for: .screenTime)!,
+                                        coordinator.manager(for: .notification)!,
                                     ],
                                     optionalManagers: [
-                                        coordinator.manager(for: .notification)!,
                                         coordinator.manager(for: .location)!
                                     ]
                                 )
